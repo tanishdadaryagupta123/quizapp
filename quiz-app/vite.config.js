@@ -1,3 +1,4 @@
+// vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -5,45 +6,24 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   server: {
-    proxy: {
-      '/api': {
-        target: 'https://opentdb.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-        secure: true,  // Enforce HTTPS
-        timeout: 5000, // 5 second timeout
-        // Add headers if needed
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        }
-      },
+    port: 5173,
+    strictPort: false, // Allow fallback to another port if 5173 is taken
+    host: 'localhost',
+    open: true, // Automatically open browser
+    watch: {
+      usePolling: true
     },
-    host: true,      // Expose to network
-    port: 5173,      // Explicit port
-    strictPort: true // Fail if port is in use
+    // Remove middlewareMode as it's causing issues
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+    extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json']
   },
   optimizeDeps: {
     esbuildOptions: {
-      loader: 'jsx',
-      target: 'esnext',
-      jsx: 'automatic', // Enable automatic JSX runtime
-    },
-  },
-  build: {
-    target: 'esnext',
-    sourcemap: true,  // Enable source maps for debugging
-    minify: 'esbuild', // Use esbuild for minification
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-        },
+      loader: {
+        '.js': 'jsx',
+        '.jsx': 'jsx'
       },
-    },
-  },
+    }
+  }
 })
